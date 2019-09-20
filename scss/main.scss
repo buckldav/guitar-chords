@@ -8,8 +8,9 @@
   }
 
   #main-content {
-    width: 8.5in;
-    padding: 0.5in;
+    max-width: 1000px;
+    width: calc(100% - 64px);
+    padding: 32px;
     margin: 0 auto;
     text-align: center;
     background: white;

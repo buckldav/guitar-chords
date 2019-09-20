@@ -15,22 +15,77 @@ function getKey(chordString) {
   }
 }
 
+// The keys are the qualities
+const QUALITIES = {
+  "maj": ["maj", "ma", "M", "^"],
+  "min": ["min", "mi", "m", "-"],
+  "dim": ["dim", "o"],
+  "aug": ["aug", "+"],
+  "dom": []
+}
 /**
- * @returns quality: M, m, dim, aug
+ * @returns quality: (see above keys in the dictionary)
  */
 function getQuality(chordString) {
-  if ((chordString[0] >= '0' && chordString[0] <= '9') || chordString.length == 0) {
-    endIndex = 0
-  } else if (chordString.indexOf("M") == 0 || chordString.indexOf("m") == 0) {
-    endIndex = 1
-  } else if (chordString.indexOf("dim") == 0 || chordString.indexOf("aug") == 0) {
-    endIndex = 3
+  var quality = ""
+  var remainder = ""
+  var extension = ""
+  // Check if the quality is valid
+  if (chordString.length == 0) {
+    // If there's nothing left in the chordString, quality = "maj"
+    quality = "maj"
+  } else if (chordString.indexOf('6') == 0) {
+    // It's a six chord, quality = "maj"
+    quality = "maj"
+    extension = "6"
+  } else if (chordString.indexOf('7') == 0 || chordString.indexOf('9') == 0) {
+    // If it's 7 or 9 immediately following the key, quality = "dom"
+    quality = "dom"
+    extension = chordString[0]
+  } else if (chordString.indexOf('11') == 0 || chordString.indexOf('13') == 0) {
+    // If it's 11 or 13 immediately following the key, quality = "dom"
+    quality = "dom"
+    extension = chordString.substring(0,2)
+  } else if (chordString[0] >= '0' && chordString[0] <= '9') {
+    // If it's any other number immediately following the key, invalid
+    throw "Invalid chord quality"
   } else {
+    // Otherwise, check if it's a valid chord quality in the dictionary
+    // Set the substring endIndex to the length of the quality
+    for (var qKey in QUALITIES) {
+      let values = QUALITIES[qKey]
+      if (quality == "") {
+        for (let i = 0; i < values.length; i++) {
+          if (chordString.indexOf(values[i]) == 0) {
+            quality = qKey
+            chordString = chordString.substring(values[i].length, chordString.length)
+            console.log(chordString)
+            // Get extension
+            if (chordString.indexOf('6') == 0 || chordString.indexOf('7') == 0 || chordString.indexOf('9') == 0) {
+              // If it's 6, 7, or 9 
+              extension = chordString[0]
+            } else if (chordString.indexOf('11') == 0 || chordString.indexOf('13') == 0) {
+              // If it's 11 or 13
+              extension = chordString.substring(0,2)
+            }
+            
+            remainder = chordString.substring(extension.length, chordString.length)
+            break
+          }
+        } 
+      }
+    }
+  }
+
+  // If the quality still equals "", invalid
+  if (quality == "") {
     throw "Invalid chord quality"
   }
+
   return {
-    "quality": chordString.substring(0, endIndex),
-    "remainder": chordString.substring(endIndex, chordString.length)
+    "quality": quality,
+    "extension": extension,
+    "remainder": remainder
   }
 }
 
@@ -38,12 +93,35 @@ E_STR_MAP = {"E": 0,"Fb": 0,"E#": 1,"F": 1,"F#": 2,"Gb": 2,"G": 3,"G#": 4,"Ab": 
 A_STR_MAP = {"A": 0,"A#": 1,"Bb": 1,"B": 2,"Cb": 2,"B#": 3,"C": 3,"C#": 4,"Db": 4,"D": 5,"D#": 6,"Eb": 6,"E": 7,"Fb": 7,"E#": 8,"F": 8,"F#": 9,"Gb": 9,"G": 10,"G#": 11,"Ab": 11} 
 D_STR_MAP = {"D": 0,"D#": 1,"Eb": 1,"E": 2,"Fb": 2,"E#": 3,"F": 3,"F#": 4,"Gb": 4,"G": 5,"G#": 6,"Ab": 6,"A": 7,"A#": 8,"Bb": 8,"B": 9,"Cb": 9,"B#": 10,"C": 10,"C#": 11,"Db": 11} 
 
+function isMajor(quality) {
+  return quality == "maj"
+}
+function isDominant(quality) {
+  return quality == "dom"
+}
+function isMinor(quality) {
+  return quality == "min"
+}
+
 function makeCshape(chordObj) {
   var key = A_STR_MAP[chordObj.key]
   // Fit the C chord
   key = key >= 3 ? key : key + 12
-  var majChord = ["X",key,key-1,key-3,key-2,key-3]
-  var finalChord = majChord
+  var finalChord = ""
+  // Basic quality
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = ["X",key,key-1,key-3,key-2,key-3]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = ["X",key,key-1,key,key-2,key]
+  } else if (isMinor(chordObj.quality)) {
+    // If it's a Cm chord, the eString gets a different value
+    let eString = key == 3 ? key : key - 4
+    // Minor chord
+    finalChord = ["X",key,key-2,key-3,key-2,eString]
+  }
+
   $("#chords").append(`
   <div>
     <h4>C Shape</h4>
@@ -61,8 +139,17 @@ E: `+ finalChord[0] +`
 
 function makeAshape(chordObj) {
   var key = A_STR_MAP[chordObj.key]
-  var majChord = ["X",key,key+2,key+2,key+2,key]
-  var finalChord = majChord
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = ["X",key,key+2,key+2,key+2,key]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = ["X",key,key+2,key,key+2,key]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = ["X",key,key+2,key+2,key+1,key]
+  }
   $("#chords").append(`
   <div>
     <h4>A Shape</h4>
@@ -82,8 +169,17 @@ function makeGshape(chordObj) {
   var key = E_STR_MAP[chordObj.key]
   // Fit the G chord
   key = key >= 3 ? key : key + 12
-  var majChord = [key,key-1,key-3,key-3,key-3,key]
-  var finalChord = majChord
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = [key,key-1,key-3,key-3,key-3,key]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = [key,key-1,key-3,key-3,key-3,key-2]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = [key,key-2,key-3,key-3,key,key]
+  }
   $("#chords").append(`
   <div>
     <h4>G Shape</h4>
@@ -101,8 +197,21 @@ E: `+ finalChord[0] +`
 
 function makeEshape(chordObj) {
   var key = E_STR_MAP[chordObj.key]
-  var majChord = [key,key+2,key+2,key+1,key,key]
-  var finalChord = majChord
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = [key,key+2,key+2,key+1,key,key]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = [key,key+2,key,key+1,key,key]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = [key,key+2,key+2,key,key,key]
+  }
+
+  // Add 9
+
+
   $("#chords").append(`
   <div>
     <h4>E Shape</h4>
@@ -120,8 +229,17 @@ E: `+ finalChord[0] +`
 
 function makeDshape(chordObj) {
   var key = D_STR_MAP[chordObj.key]
-  var majChord = ["X","X",key,key+2,key+3,key+2]
-  var finalChord = majChord
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = ["X","X",key,key+2,key+3,key+2]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = ["X","X",key,key+2,key+1,key+2]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = ["X","X",key,key+2,key+3,key+1]
+  }
   $("#chords").append(`
   <div>
     <h4>D Shape</h4>
@@ -153,9 +271,11 @@ setInterval(() => {
   try {
     keyObj = getKey($("[name='chord-input']").val())
     qualityObj = getQuality(keyObj.remainder)
+    console.log(qualityObj)
     generateChords({
       key: keyObj.key,
-      quality: qualityObj.quality
+      quality: qualityObj.quality,
+      extension: qualityObj.extension
     })
   } catch (e) {
     console.log(e)
