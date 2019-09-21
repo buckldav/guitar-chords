@@ -17,7 +17,7 @@ function getKey(chordString) {
 
 // The keys are the qualities
 const QUALITIES = {
-  "maj": ["maj", "ma", "M", "^"],
+  "maj": ["maj", "Maj", "ma", "Ma", "M", "^"],
   "min": ["min", "mi", "m", "-"],
   "dim": ["dim", "o"],
   "aug": ["aug", "+"],
@@ -109,17 +109,49 @@ function makeCshape(chordObj) {
   key = key >= 3 ? key : key + 12
   var finalChord = ""
   // Basic quality
-  if (isMajor(chordObj.quality)) {
+  if (isMajor(chordObj.quality) || isDominant(chordObj.quality)) {
     // Major chord
     finalChord = ["X",key,key-1,key-3,key-2,key-3]
-  } else if (isDominant(chordObj.quality)) {
-    // Dominant 7 chord
-    finalChord = ["X",key,key-1,key,key-2,key]
   } else if (isMinor(chordObj.quality)) {
     // If it's a Cm chord, the eString gets a different value
     let eString = key == 3 ? key : key - 4
     // Minor chord
     finalChord = ["X",key,key-2,key-3,key-2,eString]
+  }
+
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord[3] = key - 1
+    finalChord[5] = key 
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord[4] = key - 3
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord[3] = key
+    finalChord[5] = key
+  }
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[4] = key
+    if (isMajor(chordObj.quality)) {
+      finalChord[3] = key + 1
+      finalChord[5] = key
+    }
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[2] = key
+      if (isMinor(chordObj.quality)) {
+        // Minor 3rd
+        finalChord[2] = key - 2
+        // 11
+        finalChord[5] = key - 2
+      }
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      finalChord[5] = key + 2
+    }
   }
 
   $("#chords").append(`
@@ -150,6 +182,35 @@ function makeAshape(chordObj) {
     // Minor chord
     finalChord = ["X",key,key+2,key+2,key+1,key]
   }
+
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord[5] = key + 2
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord[3] = key + 1
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord[3] = key
+  }
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[4] = key
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[2] = key
+      if (isMinor(chordObj.quality)) {
+        // Minor 3rd
+        finalChord[4] = key + 1
+      }
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      finalChord[4] = key + 2
+      finalChord[5] = key + 2
+    }
+  }
+
   $("#chords").append(`
   <div>
     <h4>A Shape</h4>
@@ -180,6 +241,50 @@ function makeGshape(chordObj) {
     // Minor chord
     finalChord = [key,key-2,key-3,key-3,key,key]
   }
+
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord[5] = key - 3
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord[5] = key - 1
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord[5] = key - 2
+  }
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[2] = key
+    finalChord[3] = key - 1
+    if (isMajor(chordObj.quality)) {
+      finalChord[2] = key - 3
+    }
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[1] = key      
+      finalChord[4] = key - 2
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      if (isMajor(chordObj.quality)) {
+        finalChord[2] = key - 1
+        finalChord[3] = key - 1
+        finalChord[4] = key
+        finalChord[5] = key - 1
+      } else if (isDominant(chordObj.quality)) {
+        finalChord[2] = key
+        finalChord[3] = key - 1
+        finalChord[4] = key - 3
+        finalChord[5] = key - 3
+      } else {
+        finalChord[2] = key
+        finalChord[3] = key
+        finalChord[4] = key - 2
+        finalChord[5] = key - 3
+      }
+    }
+  }
+
   $("#chords").append(`
   <div>
     <h4>G Shape</h4>

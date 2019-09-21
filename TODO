@@ -1,3 +1,5 @@
-Extensions in the make_shape functions
+Extensions in the makeEshape & makeDshape functions
 
 Alterations should be put in ()
+
+Make the strings toggleable (ie. a switch to put an "X" there or not)
