@@ -9,15 +9,18 @@
 </head>
 <body>
   <main id="main-content">
-    <h1>Guitar Chords</h1>
-    <!-- <span>Usage: &lt;A | Ab | A# | ...&gt;&lt;M | m | dim | aug | (nothing)&gt;</span> -->
-    <header class="flex">
-      <form id="chord-form">
-        <input type="text" name="chord-input">
-      </form>
+    <header class="flex row fixed">
+      <div class="flex column" id="top">
+        <h1>Guitar Chords</h1>
+        <!-- <span>Usage: &lt;A | Ab | A# | ...&gt;&lt;M | m | dim | aug | (nothing)&gt;</span> -->
+        <form id="chord-form">
+          <input type="text" name="chord-input">
+        </form>
+      </div>
     </header>
-    <div class="flex" id="chords">
+    <div class="flex row" id="barre-chords">
     </div>
+    
   </main>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script src="scripts/main.js"></script>

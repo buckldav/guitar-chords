@@ -153,7 +153,7 @@ function makeCshape(chordObj) {
     }
   }
 
-  $("#chords").append(`
+  $("#barre-chords").append(`
   <div>
     <h4>C Shape</h4>
     <pre class="fretboard">
@@ -210,7 +210,7 @@ function makeAshape(chordObj) {
     }
   }
 
-  $("#chords").append(`
+  $("#barre-chords").append(`
   <div>
     <h4>A Shape</h4>
     <pre class="fretboard">
@@ -284,7 +284,7 @@ function makeGshape(chordObj) {
     }
   }
 
-  $("#chords").append(`
+  $("#barre-chords").append(`
   <div>
     <h4>G Shape</h4>
     <pre class="fretboard">
@@ -357,7 +357,7 @@ function makeEshape(chordObj) {
     }
   }
 
-  $("#chords").append(`
+  $("#barre-chords").append(`
   <div>
     <h4>E Shape</h4>
     <pre class="fretboard">
@@ -385,7 +385,7 @@ function makeDshape(chordObj) {
     // Minor chord
     finalChord = ["X","X",key,key+2,key+3,key+1]
   }
-  $("#chords").append(`
+  $("#barre-chords").append(`
   <div>
     <h4>D Shape</h4>
     <pre class="fretboard">
@@ -402,7 +402,7 @@ E: `+ finalChord[0] +`
 
 function generateChords(chordObj) {
   // Clear the existing chords
-  $("#chords").empty()
+  $("#barre-chords").empty()
 
   // Make the new ones
   makeCshape(chordObj)
@@ -412,7 +412,10 @@ function generateChords(chordObj) {
   makeDshape(chordObj)
   
   // Title
-  $("#chords").append(`<h2 class="vertical-title">Barre Chords</h2>`)
+  $("#barre-chords").append(`
+    <h2 class="vertical-title">Barre Chords</h2>
+    <hr style="width: 100vw;"/>
+  `)
 }
 
 setInterval(() => {
