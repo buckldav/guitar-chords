@@ -59,7 +59,6 @@ function getQuality(chordString) {
           if (chordString.indexOf(values[i]) == 0) {
             quality = qKey
             chordString = chordString.substring(values[i].length, chordString.length)
-            console.log(chordString)
             // Get extension
             if (chordString.indexOf('6') == 0 || chordString.indexOf('7') == 0 || chordString.indexOf('9') == 0) {
               // If it's 6, 7, or 9 
@@ -314,8 +313,49 @@ function makeEshape(chordObj) {
     finalChord = [key,key+2,key+2,key,key,key]
   }
 
-  // Add 9
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord = [key, key-1, key-1, key+1, key, key]
+    if (isMinor(chordObj.quality)) {
+      finalChord[3] = key
+    }
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord = [key, key+2, key+1, key+1, key, key-1]
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord = [key, key+2, key, key, key, key]
+  }
 
+  // TODODODODOD
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[5] = key + 2
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[1] = key      
+      finalChord[4] = key - 2
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      if (isMajor(chordObj.quality)) {
+        finalChord[2] = key - 1
+        finalChord[3] = key - 1
+        finalChord[4] = key
+        finalChord[5] = key - 1
+      } else if (isDominant(chordObj.quality)) {
+        finalChord[2] = key
+        finalChord[3] = key - 1
+        finalChord[4] = key - 3
+        finalChord[5] = key - 3
+      } else {
+        finalChord[2] = key
+        finalChord[3] = key
+        finalChord[4] = key - 2
+        finalChord[5] = key - 3
+      }
+    }
+  }
 
   $("#chords").append(`
   <div>
@@ -337,7 +377,7 @@ function makeDshape(chordObj) {
   var finalChord = ""
   if (isMajor(chordObj.quality)) {
     // Major chord
-    finalChord = ["X","X",key,key+2,key+3,key+2]
+    finalChord = ["X","X",key,key+2,key+2,key+2]
   } else if (isDominant(chordObj.quality)) {
     // Dominant 7 chord
     finalChord = ["X","X",key,key+2,key+1,key+2]
@@ -370,6 +410,9 @@ function generateChords(chordObj) {
   makeGshape(chordObj)
   makeEshape(chordObj)
   makeDshape(chordObj)
+  
+  // Title
+  $("#chords").append(`<h2 class="vertical-title">Barre Chords</h2>`)
 }
 
 setInterval(() => {

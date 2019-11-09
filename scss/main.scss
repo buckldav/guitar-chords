@@ -28,4 +28,9 @@
     margin: 0.5em 2em;
     text-align: left;
   }
+
+  .vertical-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
 }
