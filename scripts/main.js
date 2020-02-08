@@ -1,5 +1,11 @@
 const SEVEN_NOTES = "ABCDEFG"
 
+function translateSymbols(chordString) {
+  chordString = chordString.replace("^", "▵");
+  console.log(chordString)
+  return chordString
+}
+
 function getKey(chordString) {
   if (chordString.length > 0 && SEVEN_NOTES.indexOf(chordString[0]) != -1) {
     var endIndex = 1
@@ -17,7 +23,7 @@ function getKey(chordString) {
 
 // The keys are the qualities
 const QUALITIES = {
-  "maj": ["maj", "Maj", "ma", "Ma", "M", "^"],
+  "maj": ["maj", "Maj", "ma", "Ma", "M", "▵"],
   "min": ["min", "mi", "m", "-"],
   "dim": ["dim", "o"],
   "aug": ["aug", "+"],
@@ -153,7 +159,7 @@ function makeCshape(chordObj) {
     }
   }
 
-  $("#barre-chords").append(`
+  $("#chords").append(`
   <div>
     <h4>C Shape</h4>
     <pre class="fretboard">
@@ -210,7 +216,7 @@ function makeAshape(chordObj) {
     }
   }
 
-  $("#barre-chords").append(`
+  $("#chords").append(`
   <div>
     <h4>A Shape</h4>
     <pre class="fretboard">
@@ -284,7 +290,7 @@ function makeGshape(chordObj) {
     }
   }
 
-  $("#barre-chords").append(`
+  $("#chords").append(`
   <div>
     <h4>G Shape</h4>
     <pre class="fretboard">
@@ -357,7 +363,7 @@ function makeEshape(chordObj) {
     }
   }
 
-  $("#barre-chords").append(`
+  $("#chords").append(`
   <div>
     <h4>E Shape</h4>
     <pre class="fretboard">
@@ -385,7 +391,7 @@ function makeDshape(chordObj) {
     // Minor chord
     finalChord = ["X","X",key,key+2,key+3,key+1]
   }
-  $("#barre-chords").append(`
+  $("#chords").append(`
   <div>
     <h4>D Shape</h4>
     <pre class="fretboard">
@@ -400,35 +406,86 @@ E: `+ finalChord[0] +`
   `)
 }
 
-function generateChords(chordObj) {
-  // Clear the existing chords
-  $("#barre-chords").empty()
+function E_DGB(chordObj) {
+  var key = E_STR_MAP[chordObj.key]
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = [key,"x",key+2,key+1,key,"x"]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = [key,"x",key,key+1,key,"x"]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = [key,"x",key+2,key,key,"x"]
+  }
 
-  // Make the new ones
-  makeCshape(chordObj)
-  makeAshape(chordObj)
-  makeGshape(chordObj)
-  makeEshape(chordObj)
-  makeDshape(chordObj)
-  
-  // Title
-  $("#barre-chords").append(`
-    <h2 class="vertical-title">Barre Chords</h2>
-    <hr style="width: 100vw;"/>
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord = [key, "x", key-1, key+1, key, "x"]
+    if (isMinor(chordObj.quality)) {
+      finalChord[3] = key
+    }
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord = [key, "x", key+1, key+1, key, "x"]
+  } else if (isMinor(chordObj.quality) && chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord = [key, "x", key, key, key, "x"]
+  }
+
+  // Upper extensions
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    if (chordObj.extension == '9') {
+      finalChord[3] = key - 1
+      finalChord[4] = key - 3
+    }
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[2] = key      
+      finalChord[3] = key - 1
+      finalChord[4] = key - 2
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      finalChord[4] = key + 2
+    }
+  }
+  $("#chords").append(`
+    <div>
+      <h3>E_DGB_ shape</h3>
+      <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('')}&s=3" width="130"></iframe>
+    </div>
   `)
 }
 
-setInterval(() => {
+function generateChords(chordObj) {
+  // Clear the existing chords
+  $("#chords").empty()
+
+  // Make the new ones
+  E_DGB(chordObj)
+}
+
+makeChordsFromForm = () => {
   try {
-    keyObj = getKey($("[name='chord-input']").val())
+    var chordString = $("[name='chord-input']").val()
+    chordString = translateSymbols(chordString)
+    keyObj = getKey(chordString)
     qualityObj = getQuality(keyObj.remainder)
     console.log(qualityObj)
     generateChords({
       key: keyObj.key,
       quality: qualityObj.quality,
-      extension: qualityObj.extension
+      extension: qualityObj.extension,
+      string: chordString
     })
   } catch (e) {
     console.log(e)
   }
-}, 500)
+  return false;
+}
+
+$("[name='chord-input']").change(makeChordsFromForm);
+$("#chord-form").on('submit', makeChordsFromForm);

@@ -8,8 +8,19 @@
     min-height: 100vh;
   }
 
+  pre {
+    font-family: 'Nanum Gothic Coding', monospace;
+    white-space: pre-wrap;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
   hr {
     width: 100%;
+  }
+  hr, iframe {
     border-color: turquoise;
     border-style: solid;
     border-width: 2px;
@@ -24,10 +35,15 @@
   }
 
   .fixed {
-    top: 0;
     left: 0;
     position: fixed;
     width: 100vw;
+  }
+  .fixed.top {
+    top: 0;
+  }
+  .fixed.bottom {
+    bottom: 8px;
   }
 
   .flex {
@@ -51,7 +67,7 @@
     text-orientation: mixed;
   }
 
-  #barre-chords {
+  #chords {
     margin-top: 140px;
   }
 
