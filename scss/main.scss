@@ -55,7 +55,7 @@
     background: #fff;
   }
   .flex.row { flex-direction: row; }
-  .flex.column { flex-direction: column; }
+  .flex.column { flex-direction: column; flex: 1; }
 
   .fretboard {
     margin: 0.5em 2em;
@@ -68,7 +68,11 @@
   }
 
   #chords {
-    margin-top: 140px;
+    margin-top: 90px;
+  }
+
+  #instructions {
+    padding: 0 0.5em;
   }
 
   #top {

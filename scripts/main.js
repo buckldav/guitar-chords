@@ -452,11 +452,74 @@ function E_DGB_(chordObj) {
       finalChord[4] = key + 2
     }
   }
-  $("#chords").append(`
-    <div>
-      <h3>E_DGB_ shape</h3>
-      <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
-    </div>
+  $("#e-shapes").append(`
+    <h3>E_DGB_ shape</h3>
+    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+  `)
+}
+
+function E_DGB_alt(chordObj) {
+  var key = E_STR_MAP[chordObj.key]
+  // Fit the G chord
+  key = key >= 3 ? key : key + 12
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = [key,"x",key-3,key-3,key-3,key]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = [key,"x",key-3,key-3,key-3,key-2]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = [key,"x",key-3,key-3,key,key]
+  }
+
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord[5] = key - 3
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord[5] = key - 1
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord[5] = key - 2
+  }
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[2] = key
+    finalChord[3] = key - 1
+    if (chordObj.extension == '9' && (isMajor(chordObj.quality) || isDominant(chordObj.quality))) {
+      finalChord[2] = key - 3
+    }
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[1] = key      
+      finalChord[4] = "x"
+      finalChord[5] = "x"
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      if (isMajor(chordObj.quality)) {
+        finalChord[2] = key - 1
+        finalChord[3] = key - 1
+        finalChord[4] = key
+        finalChord[5] = key - 1
+      } else if (isDominant(chordObj.quality)) {
+        finalChord[2] = key
+        finalChord[3] = key - 1
+        finalChord[4] = key - 3
+        finalChord[5] = key - 3
+      } else {
+        finalChord[2] = key
+        finalChord[3] = key
+        finalChord[4] = key - 2
+        finalChord[5] = key - 3
+      }
+    }
+  }
+
+  $("#e-shapes").append(`
+    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
   `)
 }
 
@@ -510,24 +573,73 @@ function _ADGB_(chordObj) {
     }
   }
 
-  $("#chords").append(`
-    <div>
-      <h3>_ADGB_ shape</h3>
-      <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
-    </div>
+  $("#a-shapes").append(`
+    <h3>_ADGB_ shape</h3>
+    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+  `)
+}
+
+function _ADGB_alt(chordObj) {
+  var key = A_STR_MAP[chordObj.key]
+  var finalChord = ""
+  if (isMajor(chordObj.quality)) {
+    // Major chord
+    finalChord = ["x",key,key+2,key+2,key+2,key]
+  } else if (isDominant(chordObj.quality)) {
+    // Dominant 7 chord
+    finalChord = ["x",key,key+2,key,key+2,key]
+  } else if (isMinor(chordObj.quality)) {
+    // Minor chord
+    finalChord = ["x",key,key+2,key+2,key+1,key]
+  }
+
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord[5] = key + 2
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord[3] = key + 1
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord[3] = key
+  }
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[4] = key
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[2] = key
+      if (isMinor(chordObj.quality)) {
+        // Minor 3rd
+        finalChord[4] = key + 1
+      }
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      finalChord[4] = key + 2
+      finalChord[5] = key + 2
+    }
+  }
+
+  $("#a-shapes").append(`
+    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
   `)
 }
 
 function generateChords(chordObj) {
   // Clear the existing chords
-  $("#chords").empty()
+  $("#e-shapes").empty()
+  $("#a-shapes").empty()
 
   // Make the new ones
   E_DGB_(chordObj)
+  E_DGB_alt(chordObj)
   _ADGB_(chordObj)
+  _ADGB_alt(chordObj)
 }
 
 makeChordsFromForm = () => {
+  $("#instructions").css("display", "none")
   try {
     var chordString = $("[name='chord-input']").val()
     chordString = translateSymbols(chordString)
