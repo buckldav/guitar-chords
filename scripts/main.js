@@ -406,7 +406,7 @@ E: `+ finalChord[0] +`
   `)
 }
 
-function E_DGB(chordObj) {
+function E_DGB_(chordObj) {
   var key = E_STR_MAP[chordObj.key]
   var finalChord = ""
   if (isMajor(chordObj.quality)) {
@@ -455,7 +455,65 @@ function E_DGB(chordObj) {
   $("#chords").append(`
     <div>
       <h3>E_DGB_ shape</h3>
-      <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('')}&s=3" width="130"></iframe>
+      <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+    </div>
+  `)
+}
+
+function _ADGB_(chordObj) {
+  var key = A_STR_MAP[chordObj.key]
+  // Fit the C chord
+  key = key >= 3 ? key : key + 12
+  var finalChord = ""
+  // Basic quality
+  if (isMajor(chordObj.quality) || isDominant(chordObj.quality)) {
+    // Major chord
+    finalChord = ["x",key,key-1,key-3,key-2,"x"]
+  } else if (isMinor(chordObj.quality)) {
+    // If it's a Cm chord, the eString gets a different value
+    let eString = key == 3 ? key : key - 4
+    // Minor chord
+    finalChord = ["x",key,key-2,key-3,key-2,eString]
+  }
+
+  // Extension
+  if (chordObj.extension == '6') {
+    finalChord[3] = key - 1
+    finalChord[5] = "x" 
+  } else if (isMajor(chordObj.quality) && chordObj.extension != '') {
+    // Major 7 interval 
+    finalChord[4] = key - 3
+  } else if (chordObj.extension != '') {
+    // Minor 7 interval
+    finalChord[3] = key
+  }
+  if (chordObj.extension == '9' || chordObj.extension == '11' || chordObj.extension == '13') {
+    // 9 interval
+    finalChord[4] = key
+    if (isMajor(chordObj.quality)) {
+      finalChord[3] = key + 1
+      finalChord[5] = key
+    }
+    // 11 interval
+    if (chordObj.extension == '11') {
+      finalChord[2] = key
+      if (isMinor(chordObj.quality)) {
+        // Minor 3rd
+        finalChord[2] = key - 2
+        // 11
+        finalChord[5] = key - 2
+      }
+    }
+    // 13 interval
+    if (chordObj.extension == '13') {
+      finalChord[5] = key + 2
+    }
+  }
+
+  $("#chords").append(`
+    <div>
+      <h3>_ADGB_ shape</h3>
+      <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
     </div>
   `)
 }
@@ -465,7 +523,8 @@ function generateChords(chordObj) {
   $("#chords").empty()
 
   // Make the new ones
-  E_DGB(chordObj)
+  E_DGB_(chordObj)
+  _ADGB_(chordObj)
 }
 
 makeChordsFromForm = () => {
