@@ -27,7 +27,7 @@
   }
 
   #main-content {
-    max-width: 1000px;
+    max-width: 450px;
     width: calc(100% - 64px);
     padding: 32px;
     margin: 0 auto;
@@ -60,6 +60,10 @@
   .fretboard {
     margin: 0.5em 2em;
     text-align: left;
+  }
+
+  .hidden {
+    display: none !important;
   }
 
   .vertical-title {
