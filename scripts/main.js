@@ -2,7 +2,6 @@ const SEVEN_NOTES = "ABCDEFG"
 
 function translateSymbols(chordString) {
   chordString = chordString.replace("^", "▵");
-  console.log(chordString)
   return chordString
 }
 
@@ -44,14 +43,17 @@ function getQuality(chordString) {
     // It's a six chord, quality = "maj"
     quality = "maj"
     extension = "6"
+    remainder = chordString.substring(extension.length, chordString.length)
   } else if (chordString.indexOf('7') == 0 || chordString.indexOf('9') == 0) {
     // If it's 7 or 9 immediately following the key, quality = "dom"
     quality = "dom"
     extension = chordString[0]
+    remainder = chordString.substring(extension.length, chordString.length)
   } else if (chordString.indexOf('11') == 0 || chordString.indexOf('13') == 0) {
     // If it's 11 or 13 immediately following the key, quality = "dom"
     quality = "dom"
     extension = chordString.substring(0,2)
+    remainder = chordString.substring(extension.length, chordString.length)
   } else if (chordString[0] >= '0' && chordString[0] <= '9') {
     // If it's any other number immediately following the key, invalid
     throw "Invalid chord quality"
@@ -106,6 +108,22 @@ function isDominant(quality) {
 }
 function isMinor(quality) {
   return quality == "min"
+}
+function hasFlatFive(str) {
+  return str.indexOf("b5") != -1 || str.indexOf("-5") != -1
+}
+function hasSharpFive(str) {
+  return str.indexOf("#5") != -1 || str.indexOf("+5") != -1
+}
+function hasFlatNine(str) {
+  return str.indexOf("b9") != -1 || str.indexOf("-9") != -1
+}
+function hasSharpNine(str) {
+  return str.indexOf("#9") != -1 || str.indexOf("+9") != -1
+}
+
+function generateIframe(chordObj, finalChord) {
+  return `<iframe src="https://chordgenerator.net/${chordObj.string.replace("#", "%23")}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>`
 }
 
 function makeCshape(chordObj) {
@@ -452,9 +470,21 @@ function E_DGB_(chordObj) {
       finalChord[4] = key + 2
     }
   }
+
+  if (hasFlatFive(chordObj.remainder)) {
+    finalChord[4] = key - 1
+  } else if (hasSharpFive(chordObj.remainder)) {
+    finalChord[4] = key + 1
+  }
+  if (hasFlatNine(chordObj.remainder)) {
+
+  } else if (hasSharpNine(chordObj.remainder)) {
+    
+  }
+
   $("#e-shapes").append(`
     <h3>E_DGB_ shape</h3>
-    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+    ${generateIframe(chordObj, finalChord)}
   `)
 }
 
@@ -518,8 +548,22 @@ function E_DGB_alt(chordObj) {
     }
   }
 
+  if (hasFlatFive(chordObj.remainder)) {
+    finalChord = [key, key+1, key, key+1, "x", "x"]
+    if (isMinor(chordObj.quality)) {
+      finalChord[3] = key
+    }
+  } else if (hasSharpFive(chordObj.remainder)) {
+    finalChord[2] = key - 2
+  }
+  if (hasFlatNine(chordObj.remainder)) {
+
+  } else if (hasSharpNine(chordObj.remainder)) {
+    
+  }
+
   $("#e-shapes").append(`
-    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+    ${generateIframe(chordObj, finalChord)}
   `)
 }
 
@@ -573,9 +617,20 @@ function _ADGB_(chordObj) {
     }
   }
 
+  if (hasFlatFive(chordObj.remainder)) {
+    finalChord[5] = key - 1
+  } else if (hasSharpFive(chordObj.remainder)) {
+    finalChord[5] = key + 1
+  }
+  if (hasFlatNine(chordObj.remainder)) {
+    finalChord[4] = key - 1
+  } else if (hasSharpNine(chordObj.remainder)) {
+    finalChord[4] = key + 1
+  }
+
   $("#a-shapes").append(`
     <h3>_ADGB_ shape</h3>
-    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+    ${generateIframe(chordObj, finalChord)}
   `)
 }
 
@@ -621,8 +676,21 @@ function _ADGB_alt(chordObj) {
     }
   }
 
+  if (hasFlatFive(chordObj.remainder)) {
+    finalChord[2] = key + 1
+    finalChord[5] = "x"
+  } else if (hasSharpFive(chordObj.remainder)) {
+    finalChord[2] = key + 3
+    finalChord[5] = "x"
+  }
+  if (hasFlatNine(chordObj.remainder)) {
+    // finalChord[4] = key - 1
+  } else if (hasSharpNine(chordObj.remainder)) {
+    // finalChord[4] = key + 1
+  }
+
   $("#a-shapes").append(`
-    <iframe src="https://chordgenerator.net/${chordObj.string}.png?p=${finalChord.join('-')}&s=3" width="130"></iframe>
+    ${generateIframe(chordObj, finalChord)}
   `)
 }
 
@@ -668,6 +736,7 @@ makeChordsFromForm = () => {
       key: keyObj.key,
       quality: qualityObj.quality,
       extension: qualityObj.extension,
+      remainder: qualityObj.remainder,
       string: chordString
     })
   } catch (e) {
