@@ -4,6 +4,7 @@
   "description": "diagramming guitar chords",
   "main": "index.html",
   "scripts": {
+    "start": "react-scripts start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "scss": "node-sass --watch scss/main.scss -o . --output-style compressed"
   },
@@ -25,6 +26,19 @@
   "dependencies": {
     "jquery": "^3.4.1",
     "node-sass": "^4.12.0",
-    "normalize.css": "^8.0.1"
-  }
+    "normalize.css": "^8.0.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1"
+  },
+  "engines": {
+    "node": "10.14.1",
+    "npm": "6.4.1"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
