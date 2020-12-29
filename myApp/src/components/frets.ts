@@ -23,7 +23,7 @@ const fretboardDimensions = {
   x: [30,395],
   leftX: 15,
   stepX: 50,
-  topY: 50,
+  topY: 20,
   stepY: 40
 }
 const stringNotes = ["e","b","G","D","A","E"]
@@ -65,7 +65,7 @@ const fretBoxes = strings.map((string) => {
 const stringIntervals = [0,7,3,10,5,0]
 const fretDegrees = fretBoxes.map((row, i) => row.map((col, j) => {
   const start = degrees.indexOf("6\n13")
-  console.log(start)
+  // console.log(start)
   return {
     ...col,
     fill: colors.blue,
