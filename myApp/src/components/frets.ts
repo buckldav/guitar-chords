@@ -1,4 +1,5 @@
-import { degrees } from './scales';
+import { degrees, rootMap } from './scales';
+import { Root, Circle, Chord } from './types'
 
 const colors = {
   white: "#FFFFFF",
@@ -63,8 +64,8 @@ const fretBoxes = strings.map((string) => {
   })
 })
 const stringIntervals = [0,7,3,10,5,0]
-const fretDegrees = fretBoxes.map((row, i) => row.map((col, j) => {
-  const start = degrees.indexOf("6\n13")
+const generateFretDegrees = (root: Root): object[][] => fretBoxes.map((row, i) => row.map((col, j) => {
+  const start = degrees.indexOf(rootMap[root])
   // console.log(start)
   return {
     ...col,
@@ -75,27 +76,17 @@ const fretDegrees = fretBoxes.map((row, i) => row.map((col, j) => {
     verticalAlign: "middle"
   }
 }))
-interface CircleType {
-  radius: number;
-  offsetX: number | undefined;
-  stroke: string;
-  strokeWidth: number;
-}
-const noteCircle: CircleType = {
+const noteCircle: Circle = {
   radius: 15,
   offsetX: -12.5,
   stroke: colors.dark,
   strokeWidth: 3
 }
 
-interface ChordInterface {
-  degree: object;
-  noteCircle: CircleType;
-}
-function generateChord(notes: number[][]) : ChordInterface[] {
+function generateChord(notes: number[][], root: Root) : Chord[] {
   return notes.map((note) => ({
       degree: {
-        ...fretDegrees[note[0]][note[1]],
+        ...generateFretDegrees(root)[note[0]][note[1]],
         fill: colors.black,
         fontStyle: "bold"
       },
@@ -108,6 +99,71 @@ function generateChord(notes: number[][]) : ChordInterface[] {
   )
 }
 
+const chordE7 = (quality: string, extensions: string[], alterations: string[]) => {
+  let chord = [[5,3],[3,3],[2,4],[1,3]]
+
+  if (quality.includes("maj")) chord[1] = [3,4]
+  else if (quality.includes("min")) chord[2] = [2,3]
+
+  if (extensions.includes("9")) chord.push([0,5])
+  if (extensions.includes("13")) chord[3] = [1,5]
+
+  if (alterations.includes("b5") || alterations.includes("#11")) chord[3] = [1,2]
+  else if (alterations.includes("#5") || alterations.includes("b13")) chord[3] = [1,4]
+  if (alterations.includes("b9")) chord[4] = [0,4]
+  else if (alterations.includes("#9")) chord[4] = [0,6]
+
+  return chord
+}
+
+const chordE9 = (quality: string, extensions: string[], alterations: string[]) => {
+  let chord = [[5,3],[3,3],[2,2],[1,0]]
+
+  if (quality.includes("maj")) chord[1] = [3,4]
+
+  if (extensions.includes("13")) chord.push([0,0])
+
+  if (alterations.includes("b9")) chord[2] = [2,1]
+  else if (alterations.includes("#9")) chord[2] = [2,3]
+
+  return chord
+}
+
+const chordA7cShape = (quality: string, extensions: string[], alterations: string[]) => {
+  let chord = [[4,3],[3,2],[2,3],[1,1]]
+
+  if (quality.includes("maj")) {
+    chord[2] = [2,0]
+    chord[3] = [1,0]
+  } else if (quality.includes("min")) {
+    chord[1] = [3,1]
+  }
+  
+  return chord
+}
+
+const chordA9 = (quality: string, extensions: string[], alterations: string[]) => {
+  let chord = [[4,3],[3,2],[2,3],[1,3]]
+
+  if (quality.includes("maj")) chord[2] = [2,4]
+  else if (quality.includes("min")) chord[1] = [1,1]
+
+  if (extensions.includes("13") && !alterations.includes("b13")) chord.push([0,5])
+
+  else if (alterations.includes("b5") || alterations.includes("#11")) chord.push([0,2])
+  else if (alterations.includes("#5") || alterations.includes("b13")) chord.push([0,4])
+  if (alterations.includes("b9")) chord[3] = [1,2]
+  else if (alterations.includes("#9")) chord[3] = [1,4]
+
+  return chord
+}
+
+const chordA7aShape = (quality: string, extensions: string[], alterations: string[]) => {
+  let chord = [[4,3],[3,5],[2,3],[1,5]]
+  
+  return chord
+}
+
 export {
   colors,
   typography,
@@ -117,7 +173,12 @@ export {
   strings,
   frets,
   fretBoxes,
-  fretDegrees,
   noteCircle,
-  generateChord
+  generateFretDegrees,
+  generateChord,
+  chordE7,
+  chordE9,
+  chordA7cShape,
+  chordA7aShape,
+  chordA9
 }
