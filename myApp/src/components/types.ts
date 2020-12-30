@@ -14,4 +14,7 @@ interface Chord {
   degree: object;
   noteCircle: Circle;
 }
-export type { Root, Shape, Quality, ShapeQuality, Extensions, Alterations, Chord, Circle }
+interface CheckButton extends HTMLButtonElement {
+  ariaChecked: boolean;
+}
+export type { Root, Shape, Quality, ShapeQuality, Extensions, Alterations, Chord, Circle, CheckButton }

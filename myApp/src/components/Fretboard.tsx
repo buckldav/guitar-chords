@@ -15,7 +15,7 @@ import {
   chordC7,
   chordC9
 } from './frets'
-import { Quality, Root, Shape, Extensions, Alterations } from './types';
+import { Quality, Root, Shape, Extensions, Alterations, CheckButton } from './types';
 import { getSQ, QEAMap, rootMap, shapeMap } from './scales';
 
 const Fretboard: React.FC = props => {
@@ -119,6 +119,21 @@ const Fretboard: React.FC = props => {
     setRoot(root)
   }
 
+  function toggleAlterationsDisabled() {
+    if (document.querySelector(".alterations")) {
+      // The alert is up
+      console.log(document.querySelectorAll("button.alterations-button"))
+      const buttons = document.querySelectorAll("button.alterations-button")
+      buttons.forEach(val => {
+        val.addEventListener("click", (e: Event) => {
+          const unchecked = (e.currentTarget as CheckButton).ariaChecked
+          const value = ((e.currentTarget as Node).firstChild!.lastChild as HTMLElement).innerText
+          console.log("Unchecked", unchecked, "Value", value)
+        })
+      })
+    }
+  }
+
   useEffect(() => {
     setBoardSize(window.innerWidth/400 < 1.2 ? window.innerWidth/400 : 1.2)
     window.onresize = (e: Event) => {
@@ -196,12 +211,24 @@ const Fretboard: React.FC = props => {
             </IonItem>
             <IonItem>
               <IonLabel>Alts.</IonLabel>
-              <IonSelect disabled={quality === ""} multiple={true} value={alterations} onIonChange={e => e.detail.value ? setAlterations(e.detail.value) : null} style={{minWidth: "100px"}}>
+              <IonSelect 
+                disabled={quality === ""} 
+                multiple={true} 
+                value={alterations} 
+                style={{minWidth: "100px"}}
+                onIonChange={e => e.detail.value ? setAlterations(e.detail.value) : null} 
+                onIonFocus={toggleAlterationsDisabled}
+                onIonCancel={toggleAlterationsDisabled}
+                onIonBlur={toggleAlterationsDisabled}
+                interfaceOptions={{
+                  cssClass: "alterations"
+                }}
+              >
                 {getValidAlterations().map(val => 
                   (!(extensions.includes("13") && getSQ(shape, quality) !== "A7") && (val.includes("5") || val.includes("11"))) ||
-                  ((extensions.includes("9") || quality.includes("9")) && !quality.includes("min") && val.includes("9")) ||
+                  ((extensions.includes("9") || quality.includes("9")) && !(quality.includes("min") && alterations.includes("b5")) && val.includes("9")) ||
                   (extensions.includes("13") && val.includes("13")) ?
-                  <IonSelectOption value={val} key={val}>
+                  <IonSelectOption value={val} key={val} className="alterations-button">
                     {val.includes("#") ? "Sharp" : "Flat"} {val.split(/\D/).reduce((total, current) => total+current)}
                   </IonSelectOption>
                 : null)}
