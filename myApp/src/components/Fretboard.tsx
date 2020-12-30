@@ -122,13 +122,64 @@ const Fretboard: React.FC = props => {
   function toggleAlterationsDisabled() {
     if (document.querySelector(".alterations")) {
       // The alert is up
-      console.log(document.querySelectorAll("button.alterations-button"))
       const buttons = document.querySelectorAll("button.alterations-button")
-      buttons.forEach(val => {
-        val.addEventListener("click", (e: Event) => {
-          const unchecked = (e.currentTarget as CheckButton).ariaChecked
+      // Disable/Activate button
+      const toggleButton = (button: Element) => {
+        if (!button.getAttribute("disabled")) {
+          button.setAttribute("disabled", "true");
+          button.classList.add("alert-checkbox-button-disabled")
+        } else {
+          button.removeAttribute("disabled")
+          button.classList.remove("alert-checkbox-button-disabled")
+        }
+      }
+      /**
+       * Calls toggleButton for other buttons depending on the current button
+       * @param value Sharp 9, Flat 5, etc. The current element's text
+       * @param current The current button
+       */
+      const checkAndToggleByValue = (value: String, current: Element) => {
+        // Special case: A7 Shape, only one alteration allowed
+        if (getSQ(shape, quality) === "A7") {
+          buttons.forEach(button => {
+            if (button !== current) {
+              toggleButton(button)
+            }
+          })
+        }
+        // Disable other 9ths
+        else if (value.includes("9")) {
+          buttons.forEach(button => {
+            if (button !== current) {
+              if (button.classList.contains("alt9")) {
+                toggleButton(button)
+              }
+            }
+          })
+        } 
+        // Disable other 5ths, #11
+        else if (value.includes("5") || value.includes("11")) {
+          buttons.forEach(button => {
+            if (button !== current) {
+              if (button.classList.contains("alt5") || button.classList.contains("alt11")) {
+                toggleButton(button)
+              }
+            }
+          })
+        }
+      }
+      
+      buttons.forEach(button => {
+        const checked = (button as CheckButton).ariaChecked
+        // On load
+        if (checked === "true") {
+          const value = ((button as Node).firstChild!.lastChild as HTMLElement).innerText
+          checkAndToggleByValue(value, button as Element)
+        }
+        // On click
+        button.addEventListener("click", (e: Event) => {
           const value = ((e.currentTarget as Node).firstChild!.lastChild as HTMLElement).innerText
-          console.log("Unchecked", unchecked, "Value", value)
+          checkAndToggleByValue(value, e.currentTarget as Element)
         })
       })
     }
@@ -228,7 +279,7 @@ const Fretboard: React.FC = props => {
                   (!(extensions.includes("13") && getSQ(shape, quality) !== "A7") && (val.includes("5") || val.includes("11"))) ||
                   ((extensions.includes("9") || quality.includes("9")) && !(quality.includes("min") && alterations.includes("b5")) && val.includes("9")) ||
                   (extensions.includes("13") && val.includes("13")) ?
-                  <IonSelectOption value={val} key={val} className="alterations-button">
+                  <IonSelectOption value={val} key={val} className={`alterations-button alt${val.split(/\D/).reduce((total, current) => total+current)}`}>
                     {val.includes("#") ? "Sharp" : "Flat"} {val.split(/\D/).reduce((total, current) => total+current)}
                   </IonSelectOption>
                 : null)}
