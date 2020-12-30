@@ -1,5 +1,9 @@
-type Root = "E" | "A"
-type Shape = "C" | "A" | "G" | "E" | "D" | ""
+type Root = "E" | "A" | "D"
+type Shape = "C" | "A" | "G" | "E" | "D" | "e" | ""
+type Quality = "7" | "min7" | "maj7" | "9" | "min9" | "maj9" | "11" | ""
+type ShapeQuality = "E7" | "E9" | "G7" | "C7" | "C9" | "A7"
+type Extensions = "9" | "13"
+type Alterations = "b5" | "#5" | "b9" | "#9" | "#11" | "b13"
 interface Circle {
   radius: number;
   offsetX: number | undefined;
@@ -10,4 +14,4 @@ interface Chord {
   degree: object;
   noteCircle: Circle;
 }
-export type { Root, Shape, Chord, Circle }
+export type { Root, Shape, Quality, ShapeQuality, Extensions, Alterations, Chord, Circle }

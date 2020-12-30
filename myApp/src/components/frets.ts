@@ -1,5 +1,5 @@
 import { degrees, rootMap } from './scales';
-import { Root, Circle, Chord } from './types'
+import { Quality, Root, Circle, Chord } from './types'
 
 const colors = {
   white: "#FFFFFF",
@@ -99,7 +99,7 @@ function generateChord(notes: number[][], root: Root) : Chord[] {
   )
 }
 
-const chordE7 = (quality: string, extensions: string[], alterations: string[]) => {
+const chordE7 = (quality: Quality, extensions: string[], alterations: string[]) => {
   let chord = [[5,3],[3,3],[2,4],[1,3]]
 
   if (quality.includes("maj")) chord[1] = [3,4]
@@ -116,7 +116,7 @@ const chordE7 = (quality: string, extensions: string[], alterations: string[]) =
   return chord
 }
 
-const chordE9 = (quality: string, extensions: string[], alterations: string[]) => {
+const chordE9 = (quality: Quality, extensions: string[], alterations: string[]) => {
   let chord = [[5,3],[3,3],[2,2],[1,0]]
 
   if (quality.includes("maj")) chord[1] = [3,4]
@@ -129,7 +129,24 @@ const chordE9 = (quality: string, extensions: string[], alterations: string[]) =
   return chord
 }
 
-const chordA7cShape = (quality: string, extensions: string[], alterations: string[]) => {
+const chordG7 = (quality: Quality, extensions: string[], alterations: string[]) => {
+  let chord = [[5,3],[3,0],[2,0],[1,0],[0,3]]
+
+  if (quality.includes("7")) {
+    if (quality.includes("maj")) chord[4] = [0,2]
+    else chord[4] = [0,1]
+  }
+
+  if (extensions.includes("9")) chord[2] = [2,2]
+
+  if (alterations.includes("#5")) chord[1] = [3,1]
+  if (alterations.includes("b9")) chord[2] = [2,1]
+  else if (alterations.includes("#9")) chord[2] = [2,3]
+
+  return chord
+}
+
+const chordC7 = (quality: Quality, extensions: string[], alterations: string[]) => {
   let chord = [[4,3],[3,2],[2,3],[1,1]]
 
   if (quality.includes("maj")) {
@@ -138,11 +155,17 @@ const chordA7cShape = (quality: string, extensions: string[], alterations: strin
   } else if (quality.includes("min")) {
     chord[1] = [3,1]
   }
+
+  if (extensions.includes("9")) {
+    chord[3] = [1,3]
+    if (alterations.includes("b9")) chord[3] = [1,2]
+    else if (alterations.includes("b9")) chord[3] = [1,4]
+  }
   
   return chord
 }
 
-const chordA9 = (quality: string, extensions: string[], alterations: string[]) => {
+const chordC9 = (quality: Quality, extensions: string[], alterations: string[]) => {
   let chord = [[4,3],[3,2],[2,3],[1,3]]
 
   if (quality.includes("maj")) chord[2] = [2,4]
@@ -158,9 +181,17 @@ const chordA9 = (quality: string, extensions: string[], alterations: string[]) =
   return chord
 }
 
-const chordA7aShape = (quality: string, extensions: string[], alterations: string[]) => {
+const chordA7 = (quality: Quality, extensions: string[], alterations: string[]) => {
   let chord = [[4,3],[3,5],[2,3],[1,5]]
   
+  if (quality.includes("maj")) chord[2] = [2,4]
+  else if (quality.includes("min")) chord[3] = [1,4]
+
+  if (extensions.includes("13") && !alterations.includes("b13")) chord.push([0,5])
+
+  else if (alterations.includes("b5") || alterations.includes("#11")) chord[1] = [3,4]
+  else if (alterations.includes("#5") || alterations.includes("b13")) chord[1] = [3,6]
+
   return chord
 }
 
@@ -178,7 +209,8 @@ export {
   generateChord,
   chordE7,
   chordE9,
-  chordA7cShape,
-  chordA7aShape,
-  chordA9
+  chordG7,
+  chordA7,
+  chordC7,
+  chordC9
 }

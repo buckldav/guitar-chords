@@ -10,17 +10,19 @@ import {
   generateChord,
   chordE7,
   chordE9,
-  chordA7cShape,
-  chordA9
+  chordG7,
+  chordA7,
+  chordC7,
+  chordC9
 } from './frets'
-import { Root, Shape } from './types';
-import { shapeMap } from './scales';
+import { Quality, Root, Shape, Extensions, Alterations } from './types';
+import { getSQ, QEAMap, rootMap, shapeMap } from './scales';
 
 const Fretboard: React.FC = props => {
   const [boardSize, setBoardSize] = useState<number>(1)
   const [root, setRoot] = useState<Root>("E")
   const [shape, setShape] = useState<Shape>("E")
-  const [quality, setQuality] = useState<string>("")
+  const [quality, setQuality] = useState<Quality>("")
   const [extensions, setExtensions] = useState<string[]>([])
   const [alterations, setAlterations] = useState<string[]>([])
 
@@ -29,7 +31,9 @@ const Fretboard: React.FC = props => {
     if (root === "E") {
       if (shape === "E" && quality.includes("7")) {
         chord = chordE7(quality, extensions, alterations)
-      } else if (shape === "E" && quality.includes("9")) {
+      } else if (shape === "G" && quality.includes("7")) {
+        chord = chordG7(quality, extensions, alterations)
+      } else if (quality.includes("9")) {
         chord = chordE9(quality, extensions, alterations)
       } else {
         chord = [[5,3]]
@@ -37,14 +41,29 @@ const Fretboard: React.FC = props => {
     }
     if (root === "A") {
       if (shape === "C" && quality.includes("7")) {
-        chord = chordA7cShape(quality, extensions, alterations)
-      } else if (shape === "C" && quality.includes("9")) {
-        chord = chordA9(quality, extensions, alterations)
+        chord = chordC7(quality, extensions, alterations)
+      } else if (shape === "A" && quality.includes("7")) {
+        chord = chordA7(quality, extensions, alterations)
+      } else if (quality.includes("9")) {
+        chord = chordC9(quality, extensions, alterations)
       } else {
         chord = [[4,3]]
       }
     }
+    if (root === "D") {
+      chord = [[3,3]]
+    }
     return generateChord(chord, root)
+  }
+
+  function getValidExtensions() {
+    const valid = QEAMap[getSQ(shape, quality)]
+    return valid ? valid.extensions : Array<Extensions>()
+  }
+
+  function getValidAlterations() {
+    const valid = QEAMap[getSQ(shape, quality)]
+    return valid ? valid.alterations : Array<Alterations>()
   }
 
   function getChordDescription() {
@@ -54,12 +73,13 @@ const Fretboard: React.FC = props => {
 
     if (quality.includes("7") || quality.includes("9")) {
       if (quality.includes("maj")) {
-        strQuality = "Major 7th"
+        strQuality = "Major"
       } else if (quality.includes("min")) {
-        strQuality = "Minor 7th"
+        strQuality = "Minor"
       } else {
-        strQuality = "Dominant 7th"
+        strQuality = "Dominant"
       }
+      if (!alterations.includes("maj7")) extAndAlt.push("7")
       if (alterations.includes("b5")) extAndAlt.push("b5")
       if (alterations.includes("#5")) extAndAlt.push("#5")
       if (quality.includes("9") || extensions.includes("9")) {
@@ -74,7 +94,7 @@ const Fretboard: React.FC = props => {
       }
     }
     return strQuality !== "" ? extAndAlt.length !== 0 ? 
-      `${strQuality} with ${extAndAlt.reduce((total, current, i) => (total + (i<extAndAlt.length ? ", ": "") + current))}` 
+      `${strQuality} ${extAndAlt.reduce((total, current, i) => (total + (i<extAndAlt.length ? ", ": "") + current))}` 
       : strQuality 
       : empty
   }
@@ -84,7 +104,7 @@ const Fretboard: React.FC = props => {
     setExtensions(extensions)
   }
 
-  function setQualityAndClear(quality: string) {
+  function setQualityAndClear(quality: Quality) {
     setExtensionsAndClear([])
     setQuality(quality)
   }
@@ -111,8 +131,7 @@ const Fretboard: React.FC = props => {
     <IonItem>
       <IonLabel>Root</IonLabel>
       <IonSelect value={root} onIonChange={e => setRootAndClear(e.detail.value)} style={{minWidth: "150px"}}>
-      <IonSelectOption value="E">E String</IonSelectOption>
-      <IonSelectOption value="A">A String</IonSelectOption>
+        {Object.keys(rootMap).map(val => <IonSelectOption value={val} key={val}>{val} String</IonSelectOption>)}
       </IonSelect>
     </IonItem>
     <Stage width={400} height={250} style={{transform: `scale(${boardSize})`, margin: `${boardSize}rem 0`}}>
@@ -151,8 +170,8 @@ const Fretboard: React.FC = props => {
           <IonCol>
             <IonRadioGroup allowEmptySelection={true} value={shape} onIonChange={e => setShapeAndClear(e.detail.value)}>
               {shapeMap[root].map(val => (
-                <IonItem>
-                  <IonLabel>{val} Shape</IonLabel>
+                <IonItem key={val}>
+                  <IonLabel>{val.toUpperCase()} Shape</IonLabel>
                   <IonRadio slot="end" value={val} />
                 </IonItem>
               ))}
@@ -171,26 +190,21 @@ const Fretboard: React.FC = props => {
             </IonItem>
             <IonItem>
               <IonLabel>Exts.</IonLabel>
-              <IonSelect disabled={quality === ""} multiple={true} value={extensions} onIonChange={e => setExtensionsAndClear(e.detail.value)} style={{minWidth: "100px"}}>
-                {!quality.includes("9") ? <IonSelectOption value="9">Add 9</IonSelectOption> : null}
-                <IonSelectOption value="13">Add 13</IonSelectOption>
+              <IonSelect disabled={quality === ""} multiple={true} value={extensions} onIonChange={e => e.detail.value ? setExtensionsAndClear(e.detail.value) : null} style={{minWidth: "100px"}}>
+                {getValidExtensions().map(val => <IonSelectOption value={val} key={val}>Add {val}</IonSelectOption>)}
               </IonSelect>
             </IonItem>
             <IonItem>
               <IonLabel>Alts.</IonLabel>
-              <IonSelect disabled={quality === ""} multiple={true} value={alterations} onIonChange={e => setAlterations(e.detail.value)} style={{minWidth: "100px"}}>
-                {!(root === "E" && quality.includes("9")) && !extensions.includes("13") ? <>
-                  <IonSelectOption value="b5">Flat 5</IonSelectOption>
-                  <IonSelectOption value="#5">Sharp 5</IonSelectOption>
-                </> : null}
-                {quality.includes("9") || extensions.includes("9") ? <>
-                  <IonSelectOption value="b9">Flat 9</IonSelectOption>
-                  {!quality.includes("min") ? <IonSelectOption value="#9">Sharp 9</IonSelectOption> : null}
-                </> : null}
-                {!(root === "E" && quality.includes("9")) && !extensions.includes("13") && !quality.includes("min") ? <>
-                  <IonSelectOption value="#11">Sharp 11</IonSelectOption> 
-                </> : null}
-                {!(root === "E" && quality.includes("9")) && extensions.includes("13") ? <IonSelectOption value="b13">Flat 13</IonSelectOption> : null}
+              <IonSelect disabled={quality === ""} multiple={true} value={alterations} onIonChange={e => e.detail.value ? setAlterations(e.detail.value) : null} style={{minWidth: "100px"}}>
+                {getValidAlterations().map(val => 
+                  (!(extensions.includes("13") && getSQ(shape, quality) !== "A7") && (val.includes("5") || val.includes("11"))) ||
+                  ((extensions.includes("9") || quality.includes("9")) && !quality.includes("min") && val.includes("9")) ||
+                  (extensions.includes("13") && val.includes("13")) ?
+                  <IonSelectOption value={val} key={val}>
+                    {val.includes("#") ? "Sharp" : "Flat"} {val.split(/\D/).reduce((total, current) => total+current)}
+                  </IonSelectOption>
+                : null)}
               </IonSelect>
             </IonItem>
           </IonCol>
