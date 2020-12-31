@@ -1,5 +1,5 @@
 import { degrees, rootMap } from './scales';
-import { Quality, Root, Circle, Chord } from './types'
+import { Root, Circle } from './types'
 
 const colors = {
   white: "#FFFFFF",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
   IonIcon,
@@ -10,10 +10,10 @@ import {
   IonTabs
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { home, star, pulse } from 'ionicons/icons';
+import { bulb, pulse, hammer } from 'ionicons/icons';
 import Chords from './pages/Chords';
-// import Tab2 from './pages/Tab2';
-// import Tab3 from './pages/Tab3';
+import Concepts from './pages/Concepts';
+import Progressions from './pages/Progressions';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -39,18 +39,19 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          {/* <Route path="/tab2" component={Tab2} exact={true} />
-          <Route path="/tab3" component={Tab3} /> */}
-          <Route path="/" component={Chords} exact={true} />
+          <Route path="/concepts" component={Concepts} exact={true} />
+          <Route path="/progressions" component={Progressions} exact={true} />
+          <Route path="/chords" component={Chords} exact={true} />
+          <Route path="/" component={() => <Redirect to="/chords" />} exact={true} />
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
-          <IonTabButton tab="home" href="/">
-            <IonIcon icon={home} />
-            <IonLabel>Jazz Chords</IonLabel>
+          <IonTabButton tab="concepts" href="/concepts">
+            <IonIcon icon={bulb} />
+            <IonLabel>Concepts</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="star" href="/favorites">
-            <IonIcon icon={star} />
-            <IonLabel>Favorites</IonLabel>
+          <IonTabButton tab="chords" href="/chords">
+            <IonIcon icon={hammer} />
+            <IonLabel>Chord Builder</IonLabel>
           </IonTabButton>
           <IonTabButton tab="progressions" href="/progressions">
             <IonIcon icon={pulse} />

@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import {
-  generateChord,
-  chordE7,
-  chordE9,
-  chordG7,
-  chordA7,
-  chordC7,
-  chordC9
+  getChord,
+  getChordDescription
 } from '../components/chords';
 import { getSQ, QEAMap, rootMap, shapeMap } from '../components/scales';
 import { Quality, Root, Shape, Extensions, Alterations, CheckButton } from '../components/types';
@@ -22,36 +17,6 @@ const Chords: React.FC = () => {
   const [extensions, setExtensions] = useState<string[]>([])
   const [alterations, setAlterations] = useState<string[]>([])
 
-  function getChord() {
-    let chord: number[][] = [[]]
-    if (root === "E") {
-      if (shape === "E" && quality.includes("7")) {
-        chord = chordE7(quality, extensions, alterations)
-      } else if (shape === "G" && quality.includes("7")) {
-        chord = chordG7(quality, extensions, alterations)
-      } else if (quality.includes("9")) {
-        chord = chordE9(quality, extensions, alterations)
-      } else {
-        chord = [[5,3]]
-      }
-    }
-    if (root === "A") {
-      if (shape === "C" && quality.includes("7")) {
-        chord = chordC7(quality, extensions, alterations)
-      } else if (shape === "A" && quality.includes("7")) {
-        chord = chordA7(quality, extensions, alterations)
-      } else if (quality.includes("9")) {
-        chord = chordC9(quality, extensions, alterations)
-      } else {
-        chord = [[4,3]]
-      }
-    }
-    if (root === "D") {
-      chord = [[3,3]]
-    }
-    return generateChord(chord, root)
-  }
-
   function getValidExtensions() {
     const valid = QEAMap[getSQ(shape, quality)]
     return valid ? valid.extensions : Array<Extensions>()
@@ -60,39 +25,6 @@ const Chords: React.FC = () => {
   function getValidAlterations() {
     const valid = QEAMap[getSQ(shape, quality)]
     return valid ? valid.alterations : Array<Alterations>()
-  }
-
-  function getChordDescription() {
-    const empty = "Use the below dropdowns."
-    let strQuality = ""
-    const extAndAlt = []
-
-    if (quality.includes("7") || quality.includes("9")) {
-      if (quality.includes("maj")) {
-        strQuality = "Major"
-      } else if (quality.includes("min")) {
-        strQuality = "Minor"
-      } else {
-        strQuality = "Dominant"
-      }
-      if (!alterations.includes("maj7")) extAndAlt.push("7")
-      if (alterations.includes("b5")) extAndAlt.push("b5")
-      if (alterations.includes("#5")) extAndAlt.push("#5")
-      if (quality.includes("9") || extensions.includes("9")) {
-        if (alterations.includes("b9")) extAndAlt.push("b9")
-        else if (alterations.includes("#9")) extAndAlt.push("#9")
-        else extAndAlt.push("9")
-      }
-      if (alterations.includes("#11")) extAndAlt.push("#11")
-      if (extensions.includes("13")) {
-        if (alterations.includes("b13")) extAndAlt.push("b13")
-        else extAndAlt.push("13")
-      }
-    }
-    return strQuality !== "" ? extAndAlt.length !== 0 ? 
-      `${strQuality} ${extAndAlt.reduce((total, current, i) => (total + (i<extAndAlt.length ? ", ": "") + current))}` 
-      : strQuality 
-      : empty
   }
 
   function setExtensionsAndClear(extensions: string[]) {
@@ -185,13 +117,13 @@ const Chords: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Jazz Chords</IonTitle>
+          <IonTitle>Chord Builder</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Jazz Chords</IonTitle>
+            <IonTitle size="large">Chord Builder</IonTitle>
           </IonToolbar>
         </IonHeader>
         <div className="container">
@@ -202,12 +134,12 @@ const Chords: React.FC = () => {
             </IonSelect>
           </IonItem>
 
-          <Fretboard root={root} chord={getChord()} />
+          <Fretboard root={root} chord={getChord(root, shape, quality, extensions, alterations)} />
 
           <IonList>
             <IonListHeader>
               <IonLabel style={{textAlign: "center"}}>
-                {getChordDescription()}
+                {getChordDescription(quality, extensions, alterations)}
               </IonLabel>
             </IonListHeader>
             <IonGrid>
