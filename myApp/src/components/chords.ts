@@ -176,7 +176,12 @@ function getChord(root: Root, shape: Shape, quality: Quality, extensions: string
   return generateChord(chord, root)
 }
 
+function numbersToABC() {
+  return "[CEG]"
+}
+
 export {
   getChordDescription,
-  getChord
+  getChord,
+  numbersToABC
 }

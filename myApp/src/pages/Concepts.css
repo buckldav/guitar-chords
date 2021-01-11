@@ -1,0 +1,6 @@
+.md-container {
+  padding: 1rem;
+  margin: 0 auto;
+  display: block;
+  max-width: 800px;
+}
