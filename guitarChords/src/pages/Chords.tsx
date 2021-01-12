@@ -17,6 +17,20 @@ const Chords: React.FC = () => {
   const [extensions, setExtensions] = useState<string[]>([])
   const [alterations, setAlterations] = useState<string[]>([])
 
+  function getValidQualities() {
+    const qualities: Quality[] = Array<Quality>("7", "maj7", "min7")
+    if (shape !== "D" as Shape && shape !== "e" as Shape) {
+      qualities.push("9", "maj9")
+    }
+    if (shape === "A" as Shape || shape === "C" as Shape) {
+      qualities.push("min9")
+    }
+    if (shape === "G" as Shape) {
+      qualities.splice(qualities.indexOf("min7"), 1)
+    }
+    return qualities
+  }
+
   function getValidExtensions() {
     const valid = QEAMap[getSQ(shape, quality)]
     return valid ? valid.extensions : Array<Extensions>()
@@ -158,11 +172,7 @@ const Chords: React.FC = () => {
                   <IonItem>
                     <IonLabel>Quality</IonLabel>
                     <IonSelect disabled={shape === ""} value={quality} onIonChange={e => setQualityAndClear(e.detail.value)} style={{minWidth: "80px"}}>
-                      <IonSelectOption value="7">{"7"}</IonSelectOption>
-                      <IonSelectOption value="maj7">{"maj7"}</IonSelectOption>
-                      <IonSelectOption value="min7">{"min7"}</IonSelectOption>
-                      <IonSelectOption value="9">{"9"}</IonSelectOption>
-                      <IonSelectOption value="maj9">{"maj9"}</IonSelectOption>
+                      {getValidQualities().map(val => <IonSelectOption value={val} key={val}>{val}</IonSelectOption>)}
                     </IonSelect>
                   </IonItem>
                   <IonItem>

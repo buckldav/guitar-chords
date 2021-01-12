@@ -42,6 +42,13 @@ const QEAMap = {
   "C9": {
     extensions: Array<Extensions>("13"),
     alterations: Array<Alterations>("b5", "#5", "b9", "#9", "#11", "b13")
+  },
+  "D7": {
+    alterations: Array<Alterations>("b5", "#5")
+  },
+  "e7": {
+    extensions: Array<Extensions>("9"),
+    alterations: Array<Alterations>("b9", "#9")
   }
 }
 const getSQ = (shape: Shape, quality: Quality): ShapeQuality => {
