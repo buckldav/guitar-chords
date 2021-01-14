@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import {
   getChord,
+  getChordShell,
   getChordDescription
 } from '../components/chords';
 import { getSQ, QEAMap, rootMap, shapeMap } from '../components/scales';
 import { Quality, Root, Shape, Extensions, Alterations, CheckButton } from '../components/types';
 
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonItem, IonLabel, IonList, IonListHeader, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, IonRadioGroup, IonRadio } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonItem, IonLabel, IonList, IonListHeader, IonSelect, IonSelectOption, IonGrid, IonRow, IonCol, IonRadioGroup, IonRadio, IonToggle } from '@ionic/react';
 import './Chords.css';
 import Fretboard from '../components/Fretboard';
 
 const Chords: React.FC = () => {
+  const [shell, setShell] = useState(true)
   const [root, setRoot] = useState<Root>("E")
   const [shape, setShape] = useState<Shape>("E")
   const [quality, setQuality] = useState<Quality>("")
@@ -19,26 +21,37 @@ const Chords: React.FC = () => {
 
   function getValidQualities() {
     const qualities: Quality[] = Array<Quality>("7", "maj7", "min7")
-    if (shape !== "D" as Shape && shape !== "e" as Shape) {
-      qualities.push("9", "maj9")
+    if (shell) {
+      // TODO: Include these voicings for non-shell options
+      qualities.push("6", "min6")
     }
-    if (shape === "A" as Shape || shape === "C" as Shape) {
-      qualities.push("min9")
-    }
-    if (shape === "G" as Shape) {
-      qualities.splice(qualities.indexOf("min7"), 1)
+    if (!shell) {
+      if (shape !== "D" as Shape && shape !== "e" as Shape) {
+        qualities.push("9", "maj9")
+      }
+      if (shape === "A" as Shape || shape === "C" as Shape) {
+        qualities.push("min9")
+      }
+      if (shape === "G" as Shape) {
+        qualities.splice(qualities.indexOf("min7"), 1)
+      }
     }
     return qualities
   }
 
   function getValidExtensions() {
-    const valid = QEAMap[getSQ(shape, quality)]
+    const valid = quality ? QEAMap[getSQ(shape, quality)] : false
     return valid ? valid.extensions : Array<Extensions>()
   }
 
   function getValidAlterations() {
-    const valid = QEAMap[getSQ(shape, quality)]
-    return valid ? valid.alterations : Array<Alterations>()
+    const valid = quality ? QEAMap[getSQ(shape, quality)] : false
+    if (!valid) return Array<Alterations>();
+    // Can't have b3 and #9
+    if (quality.includes("min") && valid.alterations.includes("#9")) {
+      valid.alterations.splice(valid.alterations.indexOf("#9"))
+    }
+    return valid.alterations
   }
 
   function setExtensionsAndClear(extensions: string[]) {
@@ -148,7 +161,7 @@ const Chords: React.FC = () => {
             </IonSelect>
           </IonItem>
 
-          <Fretboard root={root} chord={getChord(root, shape, quality, extensions, alterations)} />
+          <Fretboard root={root} chord={shell ? getChordShell(root, shape, quality) : getChord(root, shape, quality, extensions, alterations)} />
 
           <IonList>
             <IonListHeader>
@@ -159,6 +172,10 @@ const Chords: React.FC = () => {
             <IonGrid>
               <IonRow>
                 <IonCol>
+                  <IonItem>
+                    <IonLabel>Shell Voicing</IonLabel>
+                    <IonToggle checked={shell} onIonChange={e => setShell(e.detail.checked)} />
+                  </IonItem>
                   <IonRadioGroup allowEmptySelection={true} value={shape} onIonChange={e => setShapeAndClear(e.detail.value)}>
                     {shapeMap[root].map(val => (
                       <IonItem key={val}>
@@ -177,14 +194,14 @@ const Chords: React.FC = () => {
                   </IonItem>
                   <IonItem>
                     <IonLabel>Exts.</IonLabel>
-                    <IonSelect disabled={quality === ""} multiple={true} value={extensions} onIonChange={e => e.detail.value ? setExtensionsAndClear(e.detail.value) : null} style={{minWidth: "100px"}}>
+                    <IonSelect disabled={quality === "" || shell} multiple={true} value={extensions} onIonChange={e => e.detail.value ? setExtensionsAndClear(e.detail.value) : null} style={{minWidth: "100px"}}>
                       {getValidExtensions().map(val => <IonSelectOption value={val} key={val}>Add {val}</IonSelectOption>)}
                     </IonSelect>
                   </IonItem>
                   <IonItem>
                     <IonLabel>Alts.</IonLabel>
                     <IonSelect 
-                      disabled={quality === ""} 
+                      disabled={quality === "" || shell} 
                       multiple={true} 
                       value={alterations} 
                       style={{minWidth: "100px"}}

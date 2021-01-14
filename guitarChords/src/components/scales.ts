@@ -44,15 +44,21 @@ const QEAMap = {
     alterations: Array<Alterations>("b5", "#5", "b9", "#9", "#11", "b13")
   },
   "D7": {
+    extensions: Array<Extensions>(),
     alterations: Array<Alterations>("b5", "#5")
   },
   "e7": {
     extensions: Array<Extensions>("9"),
     alterations: Array<Alterations>("b9", "#9")
+  },
+  "6": {
+    extensions: Array<Extensions>("9"),
+    alterations: Array<Alterations>()
   }
 }
 const getSQ = (shape: Shape, quality: Quality): ShapeQuality => {
-  return shape+quality.split(/\D/).reduce((total, current) => total+current) as ShapeQuality
+  if (quality.includes("6")) return "6" as ShapeQuality
+  else return shape+quality.split(/\D/).reduce((total, current) => total+current) as ShapeQuality
 }
 // const chromaticSharps = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 // const chromaticFlats = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
