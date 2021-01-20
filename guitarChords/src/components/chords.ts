@@ -24,11 +24,11 @@ function getChordDescription(quality: Quality, extensions: string[], alterations
 
   if (quality) {
     if (quality.includes("6")) {
-      if (quality.includes("maj")) {
-        strQuality = "Major"
-      } else if (quality.includes("min")) {
+      if (quality.includes("min")) {
         strQuality = "Minor"
-      } 
+      } else {
+        strQuality = "Major"
+      }
       extAndAlt.push("6")
       if (quality.includes("9") || extensions.includes("9")) {
         extAndAlt.push("9")
