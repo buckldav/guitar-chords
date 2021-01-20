@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /chords
+
+User-agent: *
+Allow: /content

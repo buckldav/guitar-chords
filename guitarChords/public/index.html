@@ -6,7 +6,7 @@
 
     <base href="/" />
 
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -15,8 +15,10 @@
     <meta name="msapplication-tap-highlight" content="no" />
 
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <meta name="theme-color" content="#4C5C68" />
 
     <link rel="shortcut icon" type="image/png" href="%PUBLIC_URL%/assets/icon/favicon-32x32.png" />
+    <link rel="apple-touch-icon" type="image/png" href="%PUBLIC_URL%/assets/icon/apple-touch-icon.png">
 
     <!-- add to homescreen for ios -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -25,7 +27,31 @@
   </head>
 
   <body>
+    <noscript>You need to enable JavaScript to use this app.</noscript>
     <div id="root"></div>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+        https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-analytics.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      var firebaseConfig = {
+        apiKey: "AIzaSyBTakqjluN_A8Y129MHVpAwAwvbXNyheVU",
+        authDomain: "jazzguitarchords-b64e0.firebaseapp.com",
+        projectId: "jazzguitarchords-b64e0",
+        storageBucket: "jazzguitarchords-b64e0.appspot.com",
+        messagingSenderId: "476099677673",
+        appId: "1:476099677673:web:743884367f5e2dd3c14f78",
+        measurementId: "G-RP1Q82L80H"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+    </script>
   </body>
 
 </html>

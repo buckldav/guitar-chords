@@ -1,7 +1,20 @@
 # guitar-chords
 An app for recognizing patterns in how guitar chords (beyond the basic open chords) are structured. Especially useful for jazz harmony. Built with [Ionic + React](https://ionicframework.com/docs/react).
 
-[https://jazzguitarchords.netlify.app](https://jazzguitarchords.netlify.app)
+[https://jazzguitarchords-b64e0.web.app/](https://jazzguitarchords-b64e0.web.app/)
+
+## Run
+```
+cd guitarChords
+npm install
+npm start
+```
+
+## Deploy
+```
+cd guitarChords
+npm run deploy
+```
 
 ## Future
 * Flesh out chord progression/voice leading examples
