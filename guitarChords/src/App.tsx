@@ -39,10 +39,10 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route path="/concepts" component={Concepts} exact={true} />
-          <Route path="/progressions" component={Progressions} exact={true} />
-          <Route path="/chords" component={Chords} exact={true} />
-          <Redirect to="/chords" />
+          <Route path="/concepts" component={Concepts} />
+          <Route path="/progressions" component={Progressions} />
+          <Route path="/chords" component={Chords} />
+          <Redirect exact from="/" to="/chords" />
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="concepts" href="/concepts">
