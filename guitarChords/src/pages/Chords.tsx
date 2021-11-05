@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   getChord,
   getChordShell,
@@ -41,45 +41,13 @@ const Chords: React.FC = () => {
   const [root, setRoot] = useState<Root>("E");
   const [shape, setShape] = useState<Shape>("E");
   const [quality, setQuality] = useState<Quality>("7");
-  const [extensions, setExtensions] = useState<string[]>([]);
-  const [alterations, setAlterations] = useState<string[]>([]);
+  const [extensions, setExtensions] = useState<Extensions[]>([]);
+  const [alterations, setAlterations] = useState<Alterations[]>([]);
+  const [validQualities, setValidQualities] = useState<Quality[]>([]);
+  const [validExtensions, setValidExtensions] = useState<Extensions[]>([]);
+  const [validAlterations, setValidAlterations] = useState<Alterations[]>([]);
 
-  function getValidQualities() {
-    const qualities: Quality[] = Array<Quality>("7", "maj7", "min7", "dim");
-    if (shell) {
-      // TODO: Include these voicings for non-shell options
-      qualities.push("6", "min6");
-    }
-    if (!shell) {
-      if (shape !== ("D" as Shape) && shape !== ("e" as Shape)) {
-        qualities.push("9", "maj9");
-      }
-      if (shape === ("A" as Shape) || shape === ("C" as Shape)) {
-        qualities.push("min9");
-      }
-      if (shape === ("G" as Shape)) {
-        qualities.splice(qualities.indexOf("min7"), 1);
-      }
-    }
-    return qualities;
-  }
-
-  function getValidExtensions() {
-    const valid = quality ? QEAMap[getSQ(shape, quality)] : false;
-    return valid ? valid.extensions : Array<Extensions>();
-  }
-
-  function getValidAlterations() {
-    const valid = quality ? QEAMap[getSQ(shape, quality)] : false;
-    if (!valid) return Array<Alterations>();
-    // Can't have b3 and #9
-    if (quality.includes("min") && valid.alterations.includes("#9")) {
-      valid.alterations.splice(valid.alterations.indexOf("#9"));
-    }
-    return valid.alterations;
-  }
-
-  function setExtensionsAndClear(extensions: string[]) {
+  function setExtensionsAndClear(extensions: Extensions[]) {
     setAlterations([]);
     setExtensions(extensions);
   }
@@ -171,6 +139,51 @@ const Chords: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    function getValidQualities() {
+      const qualities: Quality[] = Array<Quality>("7", "maj7", "min7", "dim");
+      if (shell) {
+        // TODO: Include these voicings for non-shell options
+        qualities.push("6", "min6");
+      }
+      if (!shell) {
+        if (shape !== ("D" as Shape) && shape !== ("e" as Shape)) {
+          qualities.push("9", "maj9");
+        }
+        if (shape === ("A" as Shape) || shape === ("C" as Shape)) {
+          qualities.push("min9");
+        }
+        if (shape === ("G" as Shape)) {
+          qualities.splice(qualities.indexOf("min7"), 1);
+        }
+      }
+
+      setValidQualities(qualities);
+    }
+
+    function getValidExtensions() {
+      const valid = quality ? QEAMap[getSQ(shape, quality)] : false;
+      setValidExtensions(valid ? valid.extensions : Array<Extensions>());
+    }
+
+    function getValidAlterations() {
+      const valid = quality ? QEAMap[getSQ(shape, quality)] : false;
+      if (!valid) {
+        setValidAlterations(Array<Alterations>());
+        return;
+      }
+      // Can't have b3 and #9
+      if (quality.includes("min") && valid.alterations.includes("#9")) {
+        valid.alterations.splice(valid.alterations.indexOf("#9"));
+      }
+      setValidAlterations(valid.alterations);
+    }
+
+    getValidQualities();
+    getValidExtensions();
+    getValidAlterations();
+  }, [root, shell, shape, quality, extensions, alterations]);
+
   return (
     <IonPage>
       <IonHeader>
@@ -247,7 +260,7 @@ const Chords: React.FC = () => {
                       onIonChange={(e) => setQualityAndClear(e.detail.value)}
                       style={{ minWidth: "80px" }}
                     >
-                      {getValidQualities().map((val) => (
+                      {validQualities.map((val) => (
                         <IonSelectOption value={val} key={val}>
                           {val}
                         </IonSelectOption>
@@ -257,7 +270,7 @@ const Chords: React.FC = () => {
                   <IonItem>
                     <IonLabel>Exts.</IonLabel>
                     <IonSelect
-                      disabled={shell || extensions.length === 0}
+                      disabled={shell || validExtensions.length === 0}
                       multiple={true}
                       value={extensions}
                       onIonChange={(e) =>
@@ -267,7 +280,7 @@ const Chords: React.FC = () => {
                       }
                       style={{ minWidth: "100px" }}
                     >
-                      {getValidExtensions().map((val) => (
+                      {validExtensions.map((val) => (
                         <IonSelectOption value={val} key={val}>
                           Add {val}
                         </IonSelectOption>
@@ -277,7 +290,7 @@ const Chords: React.FC = () => {
                   <IonItem>
                     <IonLabel>Alts.</IonLabel>
                     <IonSelect
-                      disabled={shell || alterations.length === 0}
+                      disabled={shell || validAlterations.length === 0}
                       multiple={true}
                       value={alterations}
                       style={{ minWidth: "100px" }}
@@ -291,7 +304,7 @@ const Chords: React.FC = () => {
                         cssClass: "alterations",
                       }}
                     >
-                      {getValidAlterations().map((val) =>
+                      {validAlterations.map((val) =>
                         (!(
                           extensions.includes("13") &&
                           getSQ(shape, quality) !== "A7"

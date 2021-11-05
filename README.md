@@ -21,9 +21,9 @@ npm run deploy
 
 ## Future
 
+- minMaj7 alteration: Diminished chord quality not being set, Alteration not displaying.
 - Flesh out chord progression/voice leading examples
 - A few more options for voicings in the chord builder (6th, 11/sus4, Augmented)
-- Add notation [guitarChords/src/components/Notation.tsx](guitarChords/src/components/Notation.tsx)
 - Add graphics to [guitarChords/src/markdown/concepts.md](guitarChords/src/markdown/concepts.md)
 - PWA, Android, iOS builds
 - Playback: https://codesandbox.io/s/js-guitar-rf7cr?from-embed
