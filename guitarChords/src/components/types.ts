@@ -25,7 +25,7 @@ interface Chord {
   noteCircle: Circle;
 }
 interface CheckButton extends HTMLButtonElement {
-  ariaChecked: boolean | string;
+  ariaChecked: string;
 }
 interface FretboardProps {
   root: Root;
